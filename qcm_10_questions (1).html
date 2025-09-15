@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>QCM — Physique 1ère Spé</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:24px;max-width:900px}
+    h1{font-size:1.6rem}
+    .question{border:1px solid #eee;padding:12px;border-radius:8px;margin:10px 0}
+    .choices label{display:block;margin:6px 0;cursor:pointer}
+    .controls{display:flex;gap:8px;margin:12px 0}
+    .result{padding:12px;background:#f3f9f3;border:1px solid #d6efd6;border-radius:6px;margin-top:12px}
+    .linkout{word-break:break-all}
+    button{padding:8px 12px;border-radius:6px;border:1px solid #ccc;background:white;cursor:pointer}
+  </style>
+</head>
+<body>
+  <h1>QCM — Physique (niveau 1ère spécialité)</h1>
+  <p>Choisissez une réponse par question (4 possibilités). Cliquez sur <strong>Noter</strong> pour calculer la note, ou <strong>Générer un lien</strong> pour créer un lien partageable qui pré-remplira les réponses et affichera automatiquement la note.</p>
+
+  <div id="quiz"></div>
+
+  <div class="controls">
+    <button id="gradeBtn">Noter</button>
+    <button id="linkBtn">Générer un lien</button>
+    <button id="resetBtn">Réinitialiser</button>
+    <button id="copyBtn">Copier le lien</button>
+  </div>
+
+  <div id="output"></div>
+
+  <script>
+    // --- QUESTIONS ---
+    // Questions de physique niveau 1ère spé
+    const QUESTIONS = [
+      {q: "Quelle est l'unité de la force dans le S.I. ?", choices: ["Le Joule","Le Watt","Le Newton","Le Pascal"], correct: 2},
+      {q: "Quelle est la valeur de l'accélération de la pesanteur g près de la surface terrestre ?", choices: ["9,8 m·s⁻²","10 km·h⁻¹","3,0 × 10⁸ m·s⁻¹","6,67 × 10⁻¹¹ N·m²·kg⁻²"], correct: 0},
+      {q: "Quelle grandeur se calcule avec la relation U = R × I ?", choices: ["La puissance","La tension","La charge","L'énergie"], correct: 1},
+      {q: "Dans un circuit électrique, quelle est l'unité d'intensité ?", choices: ["Le Volt","L'Ampère","Le Coulomb","Le Watt"], correct: 1},
+      {q: "Quelle est la relation de la vitesse dans un mouvement rectiligne uniforme ?", choices: ["v = d / t","v = m × a","v = E / q","v = P / S"], correct: 0},
+      {q: "Quelle est l'énergie cinétique d'un objet de masse m se déplaçant à la vitesse v ?", choices: ["m × v","1/2 × m × v²","m × g × h","F × d"], correct: 1},
+      {q: "Quelle est l'unité de la puissance dans le S.I. ?", choices: ["Le Joule","Le Watt","Le Newton","Le Volt"], correct: 1},
+      {q: "Quel type d'onde est une onde sonore dans l'air ?", choices: ["Onde électromagnétique","Onde transversale","Onde longitudinale","Onde stationnaire"], correct: 2},
+      {q: "Quelle grandeur se conserve lors d'un choc élastique ?", choices: ["La masse volumique","La quantité de mouvement","La température","La pression"], correct: 1},
+      {q: "Quelle est la valeur de la vitesse de la lumière dans le vide ?", choices: ["3,0 × 10⁸ m·s⁻¹","1,5 × 10⁸ m·s⁻¹","9,8 m·s⁻²","6,67 × 10⁻¹¹"], correct: 0}
+    ];
+
+    const quizEl = document.getElementById('quiz');
+    const outputEl = document.getElementById('output');
+
+    function render(answers = []){
+      quizEl.innerHTML = '';
+      QUESTIONS.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'question';
+        div.innerHTML = `<strong>Q${i+1}.</strong> ${item.q}`;
+        const choices = document.createElement('div');
+        choices.className = 'choices';
+        item.choices.forEach((c, j) => {
+          const id = `q${i}_c${j}`;
+          const checked = answers[i] != null && Number(answers[i]) === j ? 'checked' : '';
+          choices.innerHTML += `<label><input type="radio" name="q${i}" value="${j}" ${checked}> ${c}</label>`;
+        });
+        div.appendChild(choices);
+        quizEl.appendChild(div);
+      });
+    }
+
+    function parseHash(){
+      if(!location.hash) return null;
+      try{
+        const h = location.hash.substring(1);
+        const params = new URLSearchParams(h);
+        const answersParam = params.get('answers');
+        if(!answersParam) return null;
+        const arr = decodeURIComponent(answersParam).split(',');
+        if(arr.length !== QUESTIONS.length) return null;
+        return arr;
+      }catch(e){return null}
+    }
+
+    function getSelectedAnswers(){
+      return QUESTIONS.map((_, i) => {
+        const sel = document.querySelector(`input[name=q${i}]:checked`);
+        return sel ? Number(sel.value) : null;
+      });
+    }
+
+    function grade(answers){
+      let score = 0;
+      for(let i=0;i<QUESTIONS.length;i++){
+        if(answers[i] === QUESTIONS[i].correct) score++;
+      }
+      return score;
+    }
+
+    document.getElementById('gradeBtn').addEventListener('click', ()=>{
+      const sel = getSelectedAnswers();
+      const score = grade(sel);
+      outputEl.innerHTML = `<div class="result">Vous avez obtenu <strong>${score}/${QUESTIONS.length}</strong>.</div>`;
+    });
+
+    document.getElementById('linkBtn').addEventListener('click', ()=>{
+      const sel = getSelectedAnswers();
+      const arr = sel.map(v => v==null ? -1 : v);
+      const encoded = encodeURIComponent(arr.join(','));
+      const base = location.origin + location.pathname;
+      const url = `${base}#answers=${encoded}`;
+      outputEl.innerHTML = `<div class="result">Lien généré : <div class="linkout"><a href="${url}">${url}</a></div></div>`;
+      lastGeneratedLink = url;
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', async ()=>{
+      if(!lastGeneratedLink){ outputEl.innerHTML = '<div class="result">Aucun lien à copier — générez d\'abord un lien.</div>'; return }
+      try{
+        await navigator.clipboard.writeText(lastGeneratedLink);
+        outputEl.innerHTML = '<div class="result">Lien copié dans le presse-papiers.</div>';
+      }catch(e){ outputEl.innerHTML = `<div class="result">Impossible de copier automatiquement. Voici le lien : <div class="linkout">${lastGeneratedLink}</div></div>`}
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', ()=>{
+      render(Array(QUESTIONS.length).fill(null));
+      outputEl.innerHTML = '';
+      history.replaceState(null, '', location.pathname);
+    });
+
+    let lastGeneratedLink = null;
+    const hashAnswers = parseHash();
+    if(hashAnswers){
+      render(hashAnswers.map(v => v === '-1' ? null : Number(v)));
+      const parsed = hashAnswers.map(v => v === '-1' ? null : Number(v));
+      const score = grade(parsed);
+      outputEl.innerHTML = `<div class="result">(Depuis le lien) Vous avez obtenu <strong>${score}/${QUESTIONS.length}</strong>.</div>`;
+      lastGeneratedLink = location.href;
+    }else{
+      render();
+    }
+
+  </script>
+</body>
+</html>
