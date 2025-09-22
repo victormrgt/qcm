@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QCM Physique Seconde</title>
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5dc; /* beige clair */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.qcm-container {
+    background: #ffffff;
+    padding: 25px 30px;
+    margin-top: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 700px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.qcm-box {
+    position: relative;
+    z-index: 1;
+    padding: 20px;
+    border-radius: 15px;
+    background: #f0f8ff; /* léger bleu pour les questions */
+    transition: transform 0.3s;
+}
+
+.progress-bar {
+    height: 20px;
+    width: 100%;
+    background: #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 0;
+    background: #4169E1; /* bleu royal */
+    transition: width 0.3s;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px 0;
+    border: none;
+    background: #4169E1; /* bleu royal */
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: transform 0.2s, background 0.2s;
+}
+
+button:hover {
+    background: #3655b3;
+    transform: scale(1.05);
+}
+
+.options button {
+    display: block;
+    width: 100%;
+    margin: 8px 0;
+    text-align: left;
+}
+
+.result-section {
+    display: none;
+    animation: fadeIn 0.6s ease;
+    background: #f0f8ff; /* fond bleu léger */
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.result-header h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #4169E1;
+}
+
+.result-score {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 5px 0;
+    color: #4169E1;
+}
+
+.result-appreciation {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.review-section {
+    margin-top: 20px;
+}
+
+.review-question {
+    margin-bottom: 15px;
+    padding: 15px;
+    border-left: 5px solid #4169E1;
+    background: #ffffff;
+    border-radius: 10px;
+    opacity: 0;
+    transform: scale(0.8);
+    animation: popup 0.4s forwards;
+}
+
+.review-question.incorrect {
+    border-color: #f44336;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popup {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
+</style>
+</head>
+<body>
+<div class="qcm-container">
+    <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+    <div class="qcm-box">
+        <h2 id="question-text"></h2>
+        <div class="options">
+            <button id="option0"></button>
+            <button id="option1"></button>
+            <button id="option2"></button>
+            <button id="option3"></button>
+        </div>
+        <div style="margin-top: 15px; text-align: right;">
+            <button id="skip-btn">Passer</button>
+            <button id="next-btn">Suivant</button>
+        </div>
+    </div>
+    <div class="result-section">
+        <div class="result-header">
+            <h2>Résultat du Quiz</h2>
+            <div class="result-score" id="score"></div>
+            <div class="result-appreciation" id="appreciation"></div>
+            <button id="restart-btn">Recommencer le quiz</button>
+        </div>
+        <div class="review-section" id="review"></div>
+    </div>
+</div>
+
+<script>
+// ==== QUESTIONS ====
+const allQuestions = [
+    {question:"Quelle est l'unité de la force ?", options:["Newton","Joule","Watt","Pascal"], answer:0, explanation:"La force se mesure en Newton (N)."},
+    {question:"Quel est l'effet d'une résistance sur un circuit ?", options:["Augmente le courant","Diminue le courant","Augmente la tension","Rien"], answer:1, explanation:"Une résistance diminue le courant selon la loi d'Ohm."},
+    {question:"Comment se propage la lumière ?", options:["Par conduction","Par radiation","Par convection","Par frottement"], answer:1, explanation:"La lumière se propage par radiation (ondes électromagnétiques)."},
+    {question:"Quel est le symbole de la température ?", options:["T","V","R","I"], answer:0, explanation:"La température est généralement notée T."},
+    {question:"La deuxième loi de Newton s'écrit :", options:["F=ma","E=mc²","V=IR","p=mv"], answer:0, explanation:"F=ma relie force, masse et accélération."},
+    {question:"Un conducteur parfait a :", options:["Résistance nulle","Résistance infinie","Puissance nulle","Tension nulle"], answer:0, explanation:"Un conducteur parfait (superconducteur) a une résistance nulle."},
+    {question:"La réflexion de la lumière se produit sur :", options:["Surface lisse","Surface rugueuse","Tout matériau","Air"], answer:0, explanation:"La réflexion se produit sur des surfaces lisses."},
+    {question:"La chaleur spécifique est :", options:["Q/mΔT","F/m","P/t","V×I"], answer:0, explanation:"La chaleur spécifique = Q/(mΔT)."},
+    {question:"L'accélération due à la gravité vaut environ :", options:["9,8 m/s²","10 km/h","5 m/s²","0"], answer:0, explanation:"g ≈ 9,8 m/s² à la surface de la Terre."},
+    {question:"La loi d'Ohm est :", options:["V=RI","F=ma","E=mc²","P=VI"], answer:0, explanation:"V=RI relie tension, courant et résistance."}
+];
+
+// ==== VARIABLES ====
+let selectedQuestions = [];
+let currentIndex = 0;
+let userAnswers = [];
+
+// ==== ELEMENTS ====
+const questionText = document.getElementById('question-text');
+const optionBtns = [0,1,2,3].map(i=>document.getElementById('option'+i));
+const nextBtn = document.getElementById('next-btn');
+const skipBtn = document.getElementById('skip-btn');
+const restartBtn = document.getElementById('restart-btn');
+const progressFill = document.querySelector('.progress-bar-fill');
+const qcmBox = document.querySelector('.qcm-box');
+const resultSection = document.querySelector('.result-section');
+const scoreText = document.getElementById('score');
+const appreciationText = document.getElementById('appreciation');
+const reviewDiv = document.getElementById('review');
+
+// ==== FUNCTIONS ====
+function startQuiz(){
+    currentIndex=0;
+    userAnswers=[];
+    selectedQuestions=[];
+    resultSection.style.display='none';
+    document.querySelector('.qcm-box').style.display='block';
+    
+    const shuffled = allQuestions.sort(()=>0.5-Math.random());
+    selectedQuestions = shuffled.slice(0,10);
+    updateQuestion();
+    updateProgress();
+}
+
+function updateQuestion(){
+    const q = selectedQuestions[currentIndex];
+    questionText.textContent = q.question;
+    optionBtns.forEach((btn,i)=>{
+        btn.textContent = q.options[i];
+        btn.disabled=false;
+        btn.style.background='#4169E1'; // bleu royal
+    });
+}
+
+function updateProgress(){
+    progressFill.style.width = ((currentIndex)/selectedQuestions.length*100)+'%';
+}
+
+function selectOption(i){
+    userAnswers[currentIndex]=i;
+    optionBtns.forEach((btn,j)=>btn.style.background=j===i?'#27408B':'#4169E1');
+}
+
+function nextQuestion(){
+    if(userAnswers[currentIndex]==null) userAnswers[currentIndex]=null;
+    currentIndex++;
+    if(currentIndex<selectedQuestions.length){
+        updateQuestion();
+        updateProgress();
+    } else {
+        showResult();
+    }
+}
+
+function showResult(){
+    document.querySelector('.qcm-box').style.display='none';
+    resultSection.style.display='block';
+    let correctCount=0;
+    selectedQuestions.forEach((q,i)=>{
+        if(userAnswers[i]===q.answer) correctCount++;
+    });
+    scoreText.textContent=`${correctCount} / ${selectedQuestions.length}`;
+    if(correctCount===10) appreciationText.textContent='Excellent!';
+    else if(correctCount>=7) appreciationText.textContent='Bien!';
+    else if(correctCount>=4) appreciationText.textContent='Peut mieux faire.';
+    else appreciationText.textContent='À revoir.';
+    
+    reviewDiv.innerHTML='';
+    selectedQuestions.forEach((q,i)=>{
+        const div = document.createElement('div');
+        div.className='review-question'+(userAnswers[i]!==q.answer?' incorrect':'');
+        div.style.animationDelay = `${i*0.1}s`;
+        div.innerHTML=`<strong>Q${i+1}: ${q.question}</strong><br>
+        Votre réponse: ${q.options[userAnswers[i]]||'Aucune'}<br>
+        Réponse correcte: ${q.options[q.answer]}<br>
+        Explication: ${q.explanation}`;
+        reviewDiv.appendChild(div);
+    });
+}
+
+// ==== EVENT LISTENERS ====
+optionBtns.forEach((btn,i)=>{
+    btn.addEventListener('click',()=>selectOption(i));
+});
+nextBtn.addEventListener('click',nextQuestion);
+skipBtn.addEventListener('click',nextQuestion);
+restartBtn.addEventListener('click',startQuiz);
+
+// ==== START QUIZ ====
+startQuiz();
+</script>
+</body>
+</html>
