@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interactive Quiz</title>
+  <style>
+    /* Base reset */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #333;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .quiz-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      max-width: 480px;
+      width: 100%;
+      padding: 30px 40px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .quiz-container:hover {
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    }
+
+    .quiz-header {
+      text-align: center;
+    }
+
+    .quiz-header h1 {
+      font-weight: 700;
+      font-size: 2.5rem;
+      margin-bottom: 0.3em;
+      color: #4a148c;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .quiz-header p {
+      font-size: 1.1rem;
+      color: #666;
+      font-style: italic;
+    }
+
+    .question-number {
+      font-weight: 600;
+      color: #9c27b0;
+      margin-bottom: 15px;
+      letter-spacing: 1.5px;
+      font-size: 0.95rem;
+    }
+
+    .question-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 25px;
+      color: #333;
+      line-height: 1.4;
+    }
+
+    .options-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .options-list li {
+      background: #f3e5f5;
+      border-radius: 12px;
+      padding: 15px 20px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: #6a1b9a;
+      font-weight: 500;
+      box-shadow: 0 3px 6px rgba(105, 0, 132, 0.1);
+      user-select: none;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      border: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      position: relative;
+    }
+
+    .options-list li:hover {
+      background: #9c27b0;
+      color: white;
+      box-shadow: 0 6px 12px rgba(156, 39, 176, .45);
+    }
+
+    .options-list li.selected {
+      background: #7e57c2;
+      color: white;
+      border-color: #5e35b1;
+      box-shadow: 0 8px 20px rgba(94, 53, 177, 0.7);
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+      background: #9c27b0;
+      box-shadow: 0 6px 12px rgba(156, 39, 176, 0.6);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+
+    button:disabled {
+      background: #d1c4e9;
+      cursor: default;
+      box-shadow: none;
+      color: #7e57c2;
+    }
+
+    button:hover:not(:disabled) {
+      background: #7b1fa2;
+      box-shadow: 0 10px 25px rgba(123, 31, 162, 0.8);
+    }
+
+    /* Responsive */
+    @media (max-width: 520px) {
+      .quiz-container {
+        padding: 25px 20px 35px;
+      }
+      .quiz-header h1 {
+        font-size: 2rem;
+      }
+      .question-text {
+        font-size: 1.15rem;
+      }
+      .options-list li {
+        font-size: 1rem;
+      }
+      button {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container" role="main" aria-label="Programming quiz">
+    <header class="quiz-header">
+      <h1>Programming Quiz</h1>
+      <p>Test your coding knowledge!</p>
+    </header>
+    <div class="question-number" aria-live="polite" id="question-number">Question 1 of 5</div>
+    <div class="question-text" id="question-text">Loading question...</div>
+    <ul class="options-list" id="options-list" role="list" aria-label="Answer options">
+      <!-- Options injected by JavaScript -->
+    </ul>
+    <div class="btn-container">
+      <button id="prev-btn" disabled aria-label="Previous question">Previous</button>
+      <button id="next-btn" disabled aria-label="Next question">Next</button>
+      <button id="submit-btn" disabled aria-label="Submit answers">Submit</button>
+    </div>
+  </div>
+
+  <script>
+    // Improved quiz questions example
+    const quizData = [
+      {
+        question: "Which language runs in a web browser?",
+        options: ["Java", "C", "Python", "JavaScript"],
+        correct: 3
+      },
+      {
+        question: "What does CSS stand for?",
+        options: [
+          "Central Style Sheets",
+          "Cascading Style Sheets",
+          "Cascading Simple Sheets",
+          "Cars SUVs Sailboats"
+        ],
+        correct: 1
+      },
+      {
+        question: "What does HTML stand for?",
+        options: [
+          "Hypertext Markup Language",
+          "Hypertext Markdown Language",
+          "Hyperloop Machine Language",
+          "Helicopters Terminals Motorboats Lamborginis"
+        ],
+        correct: 0
+      },
+      {
+        question: "What year was JavaScript launched?",
+        options: ["1996", "1995", "1994", "none of the above"],
+        correct: 1
+      },
+      {
+        question: "Which tool can you use to ensure code quality?",
+        options: ["Angular", "jQuery", "RequireJS", "ESLint"],
+        correct: 3
+      }
+    ];
+
+    const questionNumberEl = document.getElementById('question-number');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsListEl = document.getElementById('options-list');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const submitBtn = document.getElementById('submit-btn');
+
+    let currentQuestionIndex = 0;
+    let selectedAnswers = new Array(quizData.length).fill(null);
+
+    function renderQuestion() {
+      const current = quizData[currentQuestionIndex];
+      questionNumberEl.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+      questionTextEl.textContent = current.question;
+      optionsListEl.innerHTML = '';
+
+      current.options.forEach((option, index) => {
+        const li = document.createElement('li');
+        li.textContent = option;
+        li.tabIndex = 0;
+        li.setAttribute('role', 'button');
+        li.setAttribute('aria-pressed', selectedAnswers[currentQuestionIndex] === index);
+        if (selectedAnswers[currentQuestionIndex] === index) {
+          li.classList.add('selected');
+        }
+        li.addEventListener('click', () => selectOption(index));
+        li.addEventListener('keypress', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectOption(index);
+          }
+        });
+        optionsListEl.appendChild(li);
+      });
+
+      prevBtn.disabled = currentQuestionIndex === 0;
+      nextBtn.disabled = selectedAnswers[currentQuestionIndex] === null || currentQuestionIndex === quizData.length - 1;
+      submitBtn.disabled = selectedAnswers.includes(null);
+    }
+
+    function selectOption(index) {
+      selectedAnswers[currentQuestionIndex] = index;
+      renderQuestion();
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentQuestionIndex < quizData.length - 1 && selectedAnswers[currentQuestionIndex] !== null) {
+        currentQuestionIndex++;
+        renderQuestion();
+      }
+    });
+
+    submitBtn.addEventListener('click', () => {
+      let score = 0;
+      selectedAnswers.forEach((answer, idx) => {
+        if (answer === quizData[idx].correct) score++;
+      });
+      // Show a result overlay or alert
+      alert(`You scored ${score} out of ${quizData.length}!`);
+    });
+
+    renderQuestion();
+  </script>
+</body>
+</html>
