@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page d'accueil - QCM Versions</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Bienvenue sur le site des QCM</h1>
+    <p>Choisissez une version de QCM :</p>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="qcmv1.html">QCM Version 1</a></li>
+      <li><a href="qcmv2.html">QCM Version 2</a></li>
+      <li><a href="qcmv3.html">QCM Version 3</a></li>
+      <!-- Ajouter d'autres versions si nécessaire -->
+    </ul>
+  </nav>
+
+  <footer>
+    <p>&copy; 2025 Mon Site QCM</p>
+  </footer>
+</body>
+</html>
