@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QCM Physique Seconde</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 20px;
+    overflow-x: hidden;
+  }
+  h1 { color: #333; margin-bottom: 20px; }
+  .qcm-box {
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 700px;
+    position: relative;
+    overflow: hidden;
+  }
+  .question, .review { opacity: 0; transform: translateX(50px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .active-slide { opacity: 1 !important; transform: translateX(0px) !important; }
+  .question p { font-size: 18px; font-weight: 500; }
+  .answers label { display: block; background: #e3eaf7; margin: 10px 0; padding: 12px 15px; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+  .answers label:hover { background: #d0dbf0; }
+  input[type="radio"] { margin-right: 10px; }
+  button { margin-top: 20px; padding: 12px 25px; font-size: 16px; border: none; border-radius: 10px; background-color: #4a90e2; color: white; cursor: pointer; transition: 0.2s; margin-right: 10px; }
+  button:hover { background-color: #357ab8; }
+  #progress { width: 100%; background: #e0e0e0; border-radius: 10px; overflow: hidden; margin-bottom: 20px; height: 20px; }
+  #progress-bar { height: 100%; width: 0%; background: #4a90e2; transition: width 0.5s ease; }
+  #result { font-weight: bold; margin-top: 20px; font-size: 20px; text-align: center; }
+  #appreciation { font-size: 18px; margin-top: 10px; color: #555; }
+  .review { margin-top: 20px; padding: 15px; border-radius: 12px; background-color: #f0f4f8; border: 1px solid #d0d7de; }
+  .review h3 { margin-bottom: 10px; }
+  .review p { margin: 5px 0; }
+  .correct { color: green; font-weight: bold; }
+  .wrong { color: red; font-weight: bold; }
+  #restart-btn { display: none; }
+</style>
+</head>
+<body>
+
+<h1>QCM Physique Seconde</h1>
+<div class="qcm-box">
+  <div id="progress"><div id="progress-bar"></div></div>
+  <div id="qcm-container"></div>
+</div>
+<div id="result"></div>
+<div id="appreciation"></div>
+<button id="restart-btn" onclick="restartQuiz()">Recommencer le quiz</button>
+
+<script>
+// 50 questions
+const questions = [
+  {question:"Quelle est l'unité de la force ?", options:["Newton","Joule","Watt","Pascal"], answer:"Newton", explanation:"La force se mesure en Newton (N) selon la loi F=ma."},
+  {question:"Quelle formule permet de calculer la vitesse moyenne ?", options:["v = d / t","v = m * a","F = m * a","E = m * c²"], answer:"v = d / t", explanation:"La vitesse moyenne est le déplacement divisé par le temps."},
+  {question:"Quelle est l'unité de l'énergie ?", options:["Joule","Newton","Watt","Volt"], answer:"Joule", explanation:"L'énergie se mesure en Joule (J)."},
+  {question:"Une masse de 2 kg est soumise à une accélération de 3 m/s². Quelle est la force appliquée ?", options:["6 N","5 N","3 N","2 N"], answer:"6 N", explanation:"F = m*a → 2*3 = 6 N."},
+  {question:"Quel type d'énergie est une pomme en hauteur ?", options:["Énergie cinétique","Énergie potentielle","Énergie thermique","Énergie électrique"], answer:"Énergie potentielle", explanation:"Elle possède une énergie potentielle liée à sa position."},
+  {question:"Quelle est la formule de l'accélération ?", options:["a = F / m","a = m / F","a = v / t","a = E / m"], answer:"a = F / m", explanation:"Selon Newton, a = F/m."},
+  {question:"Quel est le symbole de la vitesse ?", options:["v","F","E","m"], answer:"v", explanation:"Le symbole courant de la vitesse est v."},
+  {question:"Quelle est l'unité de la pression ?", options:["Pascal","Newton","Joule","Watt"], answer:"Pascal", explanation:"La pression se mesure en Pascal (Pa)."},
+  {question:"L'énergie cinétique dépend de :", options:["la masse et la vitesse","la masse et la hauteur","la force et la distance","le temps et la vitesse"], answer:"la masse et la vitesse", explanation:"E_c = 1/2*m*v², donc dépend de la masse et de la vitesse."},
+  {question:"Un objet en mouvement tend à rester en mouvement selon :", options:["la loi de l’inertie","la gravitation","la thermodynamique","l’électrostatique"], answer:"la loi de l’inertie", explanation:"La première loi de Newton décrit l’inertie."},
+  {question:"Quelle est l’unité de la puissance ?", options:["Watt","Joule","Newton","Volt"], answer:"Watt", explanation:"La puissance est l'énergie fournie par unité de temps et se mesure en Watt."},
+  {question:"Quel instrument mesure la force ?", options:["Dynamomètre","Voltmètre","Thermomètre","Baromètre"], answer:"Dynamomètre", explanation:"Le dynamomètre mesure les forces appliquées."},
+  {question:"Quelle est la valeur de l'accélération gravitationnelle sur Terre ?", options:["9,8 m/s²","10 m/s²","9,8 km/s²","1 m/s²"], answer:"9,8 m/s²", explanation:"La gravité terrestre vaut environ 9,8 m/s²."},
+  {question:"Quelle est l'unité de charge électrique ?", options:["Coulomb","Volt","Ampère","Ohm"], answer:"Coulomb", explanation:"La charge électrique se mesure en Coulomb (C)."},
+  {question:"Quelle est l'unité de la tension électrique ?", options:["Volt","Ampère","Ohm","Coulomb"], answer:"Volt", explanation:"La tension se mesure en Volt (V)."},
+  {question:"Quelle est l'unité du courant électrique ?", options:["Ampère","Volt","Ohm","Coulomb"], answer:"Ampère", explanation:"Le courant électrique se mesure en Ampère (A)."},
+  {question:"Quel composant permet de mesurer la tension ?", options:["Voltmètre","Ampèremètre","Ohmmètre","Thermomètre"], answer:"Voltmètre", explanation:"Le voltmètre mesure la différence de potentiel."},
+  {question:"Quel composant mesure le courant ?", options:["Ampèremètre","Voltmètre","Ohmmètre","Thermomètre"], answer:"Ampèremètre", explanation:"L’ampèremètre mesure l’intensité du courant."},
+  {question:"Quel phénomène décrit l'absorption de lumière par un objet ?", options:["Absorption","Réflexion","Diffusion","Réfraction"], answer:"Absorption", explanation:"L'absorption correspond à l'énergie lumineuse convertie en chaleur."},
+  {question:"Quel phénomène change la direction de la lumière en passant d’un milieu à un autre ?", options:["Réfraction","Réflexion","Diffusion","Diffraction"], answer:"Réfraction", explanation:"La lumière se réfracte lorsqu'elle change de milieu."},
+  {question:"Quelle est la formule de la pression ?", options:["P = F / S","P = m * a","P = E / t","P = V * I"], answer:"P = F / S", explanation:"La pression est la force appliquée divisée par la surface."},
+  {question:"Quelle est l'unité de la température ?", options:["Kelvin","Celsius","Joule","Newton"], answer:"Kelvin", explanation:"La température en SI se mesure en Kelvin (K)."},
+  {question:"Quel gaz est majoritaire dans l’air ?", options:["Azote","Oxygène","CO2","Hydrogène"], answer:"Azote", explanation:"L’air contient environ 78% d’azote."},
+  {question:"Quelle est l’unité de l’énergie thermique ?", options:["Joule","Kelvin","Watt","Newton"], answer:"Joule", explanation:"L’énergie thermique se mesure en Joule."},
+  {question:"Quelle loi relie la tension, le courant et la résistance ?", options:["Loi d’Ohm","Loi de Newton","Loi de Coulomb","Loi de Faraday"], answer:"Loi d’Ohm", explanation:"U = R * I selon la loi d’Ohm."},
+  {question:"Quel est l’effet d’un fil conducteur coupé sur un circuit fermé ?", options:["Le courant s’arrête","Le courant augmente","Le courant diminue","Rien ne se passe"], answer:"Le courant s’arrête", explanation:"Le circuit est ouvert, le courant ne circule plus."},
+  {question:"La lumière blanche est composée de ?", options:["Toutes les couleurs","Rouge seulement","Bleu et vert","Ultraviolet"], answer:"Toutes les couleurs", explanation:"La lumière blanche est un mélange de toutes les couleurs visibles."},
+  {question:"La vitesse de la lumière dans le vide ?", options:["3×10^8 m/s","1×10^6 m/s","3×10^6 m/s","1×10^8 m/s"], answer:"3×10^8 m/s", explanation:"La lumière se déplace à environ 3×10^8 m/s dans le vide."},
+  {question:"Qu’est-ce qu’un circuit en série ?", options:["Un circuit où le courant passe par tous les composants successivement","Un circuit avec plusieurs branches","Un circuit ouvert","Un circuit avec un interrupteur seulement"], answer:"Un circuit où le courant passe par tous les composants successivement", explanation:"En série, le courant traverse tous les éléments les uns après les autres."},
+  {question:"Qu’est-ce qu’un circuit en parallèle ?", options:["Circuit avec plusieurs branches","Circuit unique","Circuit ouvert","Circuit fermé sans courant"], answer:"Circuit avec plusieurs branches", explanation:"Chaque branche a sa propre intensité de courant."},
+  {question:"Quel est le symbole de la résistance électrique ?", options:["Ω","V","A","W"], answer:"Ω", explanation:"La résistance se note en ohms, symbole Ω."},
+  {question:"Quel est le symbole du courant ?", options:["I","V","R","C"], answer:"I", explanation:"Le courant se note I en électricité."},
+  {question:"Quel est le symbole de la tension ?", options:["V","I","R","C"], answer:"V", explanation:"La tension se note V."},
+  {question:"Quel gaz est nécessaire à la combustion ?", options:["Oxygène","Azote","CO2","H2"], answer:"Oxygène", explanation:"L'oxygène est nécessaire pour que la combustion ait lieu."},
+  {question:"Quelle est la formule de l'énergie cinétique ?", options:["E_c = 1/2 m v²","E_c = m g h","E_c = F d","E_c = m a"], answer:"E_c = 1/2 m v²", explanation:"L'énergie cinétique dépend de la masse et du carré de la vitesse."},
+  {question:"Quelle est la formule de l'énergie potentielle ?", options:["E_p = m g h","E_p = 1/2 m v²","E_p = F d","E_p = m a"], answer:"E_p = m g h", explanation:"L'énergie potentielle dépend de la masse, de g et de la hauteur."},
+  {question:"Quel est l'effet de la chaleur sur la matière ?", options:["Augmente l'agitation des particules","Diminue la masse","Change la charge","Rend plus lourd"], answer:"Augmente l'agitation des particules", explanation:"La chaleur augmente l'énergie cinétique des particules."},
+  {question:"Qu’est-ce que l’inertie ?", options:["Tendance d’un corps à conserver son état de repos ou de mouvement","Capacité à se déplacer vite","Force d’attraction","Mouvement circulaire"], answer:"Tendance d’un corps à conserver son état de repos ou de mouvement", explanation:"C'est la première loi de Newton."},
+  {question:"Quelle est la loi de Coulomb ?", options:["Force électrique entre deux charges","Force gravitationnelle","Vitesse de la lumière","Tension dans un circuit"], answer:"Force électrique entre deux charges", explanation:"F = k * q1 * q2 / r²."},
+  {question:"Qu’est-ce que la réfraction ?", options:["Changement de direction de la lumière","Réflexion totale","Diffusion","Absorption"], answer:"Changement de direction de la lumière", explanation:"La lumière change de direction en passant d’un milieu à un autre."},
+  {question:"Qu’est-ce que la diffraction ?", options:["Écartement de la lumière par un obstacle","Réfraction","Absorption","Émission"], answer:"Écartement de la lumière par un obstacle", explanation:"La lumière se courbe en passant autour d’un obstacle."},
+  {question:"Qu’est-ce que la réflexion ?", options:["Renvoi de la lumière par une surface","Changement de milieu","Diffraction","Diffusion"], answer:"Renvoi de la lumière par une surface", explanation:"La lumière rebondit sur une surface réfléchissante."},
+  {question:"Quelle est la formule de la vitesse ?", options:["v = d / t","v = m * a","v = F / m","v = E / t"], answer:"v = d / t", explanation:"La vitesse est le déplacement divisé par le temps."},
+  {question:"Quel est le symbole de la masse ?", options:["m","M","g","F"], answer:"m", explanation:"La masse se note m."},
+  {question:"Quel est le symbole de la gravité ?", options:["g","G","a","F"], answer:"g", explanation:"La gravité se note g."},
+  {question:"Quel est le symbole de l'énergie ?", options:["E","F","P","I"], answer:"E", explanation:"L'énergie se note E."},
+  {question:"Quelle est l’unité de la fréquence ?", options:["Hertz","Watt","Joule","Newton"], answer:"Hertz", explanation:"La fréquence se mesure en Hertz (Hz)."},
+  {question:"Quelle est la vitesse du son dans l'air ?", options:["343 m/s","300 m/s","150 m/s","1000 m/s"], answer:"343 m/s", explanation:"La vitesse du son dans l'air est environ 343 m/s."},
+  {question:"Qu’est-ce que l’effet Joule ?", options:["Chaleur produite par un courant","Refroidissement","Électricité statique","Énergie potentielle"], answer:"Chaleur produite par un courant", explanation:"Un courant électrique produit de la chaleur dans un conducteur."}
+];
+
+let selectedQuestions = [];
+let currentQuestion = 0;
+let score = 0;
+
+const container = document.getElementById("qcm-container");
+const progressBar = document.getElementById("progress-bar");
+const resultDiv = document.getElementById("result");
+const appreciationDiv = document.getElementById("appreciation");
+const restartBtn = document.getElementById("restart-btn");
+
+function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+
+function startQuiz() {
+  selectedQuestions = shuffle(questions).slice(0,10);
+  currentQuestion = 0;
+  score = 0;
+  resultDiv.textContent = "";
+  appreciationDiv.textContent = "";
+  restartBtn.style.display = "none";
+  showQuestion(currentQuestion);
+}
+
+function showQuestion(index) {
+  container.innerHTML = "";
+  const q = selectedQuestions[index];
+  const div = document.createElement("div");
+  div.className = "question";
+  div.innerHTML = `<p>${index+1}. ${q.question}</p>`;
+  const answersDiv = document.createElement("div");
+  answersDiv.className = "answers";
+  shuffle(q.options).forEach(option => {
+    const label = document.createElement("label");
+    label.innerHTML = `<input type="radio" name="answer" value="${option}"> ${option}`;
+    answersDiv.appendChild(label);
+  });
+  div.appendChild(answersDiv);
+
+  const btnContainer = document.createElement("div");
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = index === selectedQuestions.length - 1 ? "Terminer" : "Suivant";
+  nextBtn.onclick = validateAnswer;
+  const skipBtn = document.createElement("button");
+  skipBtn.textContent = "Passer";
+  skipBtn.onclick = skipQuestion;
+  btnContainer.appendChild(nextBtn);
+  btnContainer.appendChild(skipBtn);
+  div.appendChild(btnContainer);
+
+  container.appendChild(div);
+  setTimeout(() => { div.classList.add("active-slide"); }, 50);
+  progressBar.style.width = `${(index/selectedQuestions.length)*100}%`;
+}
+
+function validateAnswer() {
+  const selected = document.querySelector('input[name="answer"]:checked');
+  if(!selected) { alert("Veuillez sélectionner une réponse ou cliquez sur Passer."); return; }
+  selectedQuestions[currentQuestion].userAnswer = selected.value; 
+  if(selected.value === selectedQuestions[currentQuestion].answer) score++;
+  currentQuestion++;
+  if(currentQuestion < selectedQuestions.length) showQuestion(currentQuestion);
+  else showReview();
+}
+
+function skipQuestion() {
+  selectedQuestions[currentQuestion].userAnswer = null;
+  currentQuestion++;
+  if(currentQuestion < selectedQuestions.length) showQuestion(currentQuestion);
+  else showReview();
+}
+
+function showReview() {
+  container.innerHTML = "";
+  progressBar.style.width = "100%";
+  resultDiv.textContent = `Votre note : ${score} / ${selectedQuestions.length}`;
+
+  const ratio = score / selectedQuestions.length;
+  if(ratio >= 0.9) appreciationDiv.textContent = "Excellent travail !";
+  else if(ratio >= 0.7) appreciationDiv.textContent = "Bien joué !";
+  else if(ratio >= 0.5) appreciationDiv.textContent = "Pas mal, mais tu peux mieux faire.";
+  else appreciationDiv.textContent = "À travailler… courage !";
+
+  selectedQuestions.forEach((q, i) => {
+    const reviewDiv = document.createElement("div");
+    reviewDiv.className = "review";
+    reviewDiv.innerHTML = `
+      <h3>${i+1}. ${q.question}</h3>
+      <p><strong>Réponse correcte :</strong> <span class="correct">${q.answer}</span></p>
+      <p><strong>Votre réponse :</strong> <span class="${q.userAnswer === q.answer ? 'correct' : 'wrong'}">${q.userAnswer ? q.userAnswer : "Non répondu"}</span></p>
+      <p><em>Explication :</em> ${q.explanation}</p>
+    `;
+    container.appendChild(reviewDiv);
+    setTimeout(() => { reviewDiv.classList.add("active-slide"); }, i*200);
+  });
+
+  restartBtn.style.display = "block";
+}
+
+function restartQuiz() {
+  startQuiz();
+}
+
+startQuiz();
+</script>
+</body>
+</html>
