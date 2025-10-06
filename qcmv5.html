@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>QCM Physique</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body {
+      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+      background: radial-gradient(circle at 65% 20%, #e3ebff 0%, #f1f5f9 100%);
+      color: #222;
+      margin: 0;
+      min-height: 100vh;
+    }
+    #container {
+      max-width: 550px;
+      margin: 44px auto;
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 8px 32px rgba(64,112,244,0.15), 0 1.5px 6px #e0e7ff;
+      padding: 38px 30px;
+      position: relative;
+      overflow: hidden;
+      animation: slideIn 0.7s;
+    }
+    @keyframes slideIn {
+      from { transform: translateY(50px); opacity: 0;}
+      to { transform: translateY(0); opacity: 1;}
+    }
+    h1 {
+      text-align: center;
+      color: #245393;
+      margin-bottom: 16px;
+      font-weight: 700;
+      font-size: 2.1em;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 0 #e0e7ff;
+    }
+    .progress-bar {
+      width: 100%;
+      background: #e6eaf7;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      height: 22px;
+      box-shadow: 0 0.5px 3px #e0e7ff inset;
+      position: relative;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, #245393 60%, #3e91ff 100%);
+      width: 0;
+      transition: width 0.5s cubic-bezier(.57,.22,.16,.99);
+      border-radius: 8px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 1;
+    }
+    .progress-text {
+      position: absolute;
+      right: 15px;
+      top: 2px;
+      font-size: 0.9em;
+      color: #245393;
+      font-weight: 600;
+      z-index: 2;
+      text-shadow: 0 1px 0 #fff;
+    }
+    .fade-in {
+      animation: fadeIn 0.5s;
+    }
+    .fade-out {
+      animation: fadeOut 0.45s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    @keyframes fadeOut {
+      from { opacity: 1;}
+      to { opacity: 0; }
+    }
+    @keyframes scorePop {
+      0% { transform: scale(0.7);}
+      60% { transform: scale(1.18);}
+      100% { transform: scale(1);}
+    }
+    .question {
+      font-size: 1.23em;
+      margin-bottom: 22px;
+      color: #245393;
+      background: linear-gradient(90deg, #e7f3ff 10%, #f9fafb 90%);
+      border-radius: 12px;
+      padding: 15px 16px;
+      box-shadow: 0 1px 8px #e0e7ff;
+      font-weight: 500;
+    }
+    .options label {
+      display: block;
+      margin: 13px 0;
+      padding: 11px 18px;
+      background: #f6fafd;
+      border-radius: 9px;
+      border: 1.2px solid #e4eaf2;
+      cursor: pointer;
+      transition: background 0.18s, border 0.18s;
+      font-weight: 400;
+      font-size: 1em;
+      position: relative;
+      box-shadow: 0 1px 6px #e0e7ff;
+    }
+    .options label input[type=radio] {
+      accent-color: #245393;
+      margin-right: 9px;
+      transform: scale(1.15);
+      vertical-align: middle;
+    }
+    .options label:hover {
+      background: #e9f1ff;
+      border-color: #245393;
+      box-shadow: 0 2px 8px #e0e7ff;
+    }
+    .label-correct {
+      background: #eafbe8 !important;
+      border-color: #4caf50 !important;
+      color: #218838 !important;
+      font-weight: 600;
+      box-shadow: 0 1px 8px #d3f9d8;
+    }
+    .label-wrong {
+      background: #ffeaea !important;
+      border-color: #f44336 !important;
+      color: #c82333 !important;
+      font-weight: 600;
+      box-shadow: 0 1px 8px #ffd6d6;
+    }
+    .label-selected {
+      box-shadow: 0 0 0 2px #245393;
+      border-width: 2px;
+    }
+    .explanation {
+      margin-top: 12px;
+      padding: 12px;
+      background: #f4f7fa;
+      border-left: 5px solid #4e8cf7;
+      border-radius: 8px;
+      color: #245393;
+      font-size: 1.07em;
+      font-weight: 500;
+    }
+    button {
+      background: linear-gradient(90deg, #245393 70%, #4e8cf7 100%);
+      color: #fff;
+      border: none;
+      padding: 13px 32px;
+      border-radius: 12px;
+      font-size: 1.09em;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 21px;
+      margin-right: 10px;
+      transition: background 0.2s, transform 0.12s;
+      box-shadow: 0 2px 14px rgba(64,112,244,0.10);
+      letter-spacing: 0.5px;
+      outline: none;
+      position: relative;
+      overflow: hidden;
+    }
+    button:active {
+      transform: scale(0.97);
+      background: #245393;
+    }
+    button.ripple {
+      background: #e5e7eb;
+      color: #245393;
+      border: 1.4px solid #e4eaf2;
+      box-shadow: none;
+    }
+    button.ripple:hover {
+      background: #e9f1ff;
+      color: #245393;
+      border: 1.4px solid #245393;
+    }
+    .ripple-effect {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: ripple 0.5s linear;
+      background: rgba(76, 144, 247, 0.28);
+      pointer-events: none;
+      z-index: 2;
+    }
+    @keyframes ripple {
+      to { transform: scale(2.5); opacity: 0;}
+    }
+    .score {
+      font-size: 2.1em;
+      font-weight: bold;
+      color: #245393;
+      margin-bottom: 15px;
+      text-align: center;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 0 #e0e7ff;
+      animation: scorePop 0.8s;
+    }
+    .comment {
+      text-align: center;
+      font-size: 1.17em;
+      margin-top: 13px;
+      margin-bottom: 24px;
+      font-weight: 500;
+      color: #4e8cf7;
+      background: #f4f7fa;
+      border-radius: 10px;
+      padding: 13px 0;
+      box-shadow: 0 1px 10px #e0e7ff;
+    }
+    .result-details {
+      text-align:center;
+      margin: 10px 0 20px 0;
+      font-size: 1.08em;
+      color: #245393;
+    }
+    .correction-list {
+      margin-top: 20px;
+      margin-bottom: 28px;
+    }
+    .correction-item {
+      margin-bottom: 13px;
+      background: #f6fafd;
+      border-radius: 9px;
+      box-shadow: 0 1px 8px #e0e7ff;
+      padding: 13px 15px;
+      font-size: 1.05em;
+    }
+    .correction-q {
+      font-weight: 600;
+      color: #245393;
+      margin-bottom: 7px;
+      display: block;
+    }
+    .correction-options {
+      margin-left: 8px;
+      margin-bottom: 4px;
+    }
+    .correction-good {
+      color: #218838;
+      font-weight: 600;
+      background: #eafbe8;
+      border-radius: 6px;
+      padding: 2px 9px;
+      border: 1px solid #4caf50;
+      margin-right: 7px;
+    }
+    .correction-bad {
+      color: #c82333;
+      font-weight: 600;
+      background: #ffeaea;
+      border-radius: 6px;
+      padding: 2px 9px;
+      border: 1px solid #f44336;
+      margin-right: 7px;
+    }
+    .correction-neutral {
+      color: #999;
+      background: #eee;
+      border-radius: 6px;
+      padding: 2px 9px;
+      border: 1px solid #ccc;
+      margin-right: 7px;
+    }
+    .qcm-select-list {
+      margin-top: 25px;
+      margin-bottom: 19px;
+      padding: 0;
+      list-style: none;
+      text-align: left;
+    }
+    .qcm-select-list li {
+      background: #e7f3ff;
+      border-radius: 10px;
+      margin-bottom: 13px;
+      padding: 13px 20px;
+      font-size: 1.11em;
+      color: #245393;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 1px 8px #e0e7ff;
+      transition: background 0.18s, color 0.18s;
+      border: 2px solid #e0e7ff;
+    }
+    .qcm-select-list li:hover, .qcm-select-list li.selected {
+      background: #4e8cf7;
+      color: #fff;
+      border-color: #245393;
+    }
+    @media (max-width: 650px) {
+      #container {
+        padding: 14px;
+        border-radius: 13px;
+      }
+      h1 { font-size: 1.2em; }
+      .score { font-size: 1.2em;}
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <h1>QCM de Physique</h1>
+    <div class="progress-bar">
+      <div class="progress" id="progress"></div>
+      <span class="progress-text" id="progress-text"></span>
+    </div>
+    <div id="qcm"></div>
+  </div>
+  <script>
+    // Plusieurs QCM de physique proposés
+    const qcmList = [
+      {
+        name: "Physique générale",
+        questions: [
+          {
+            question: "Quelle est la valeur de l’accélération due à la gravité sur Terre ?",
+            options: ["9,8 m/s²", "3,2 m/s²", "6,6 m/s²", "12,5 m/s²"],
+            answer: 0
+          },
+          {
+            question: "Qui est le père de la théorie de la relativité ?",
+            options: ["Isaac Newton", "Albert Einstein", "Galilée", "Marie Curie"],
+            answer: 1
+          },
+          {
+            question: "Quel est le symbole chimique de l’eau ?",
+            options: ["O2", "H2O", "CO2", "HO"],
+            answer: 1
+          },
+          {
+            question: "Comment nomme-t-on un courant électrique qui change de sens périodiquement ?",
+            options: ["Courant continu", "Courant alternatif", "Courant statique", "Courant permanent"],
+            answer: 1
+          },
+          {
+            question: "Quel instrument mesure la pression atmosphérique ?",
+            options: ["Baromètre", "Thermomètre", "Voltmètre", "Ampèremètre"],
+            answer: 0
+          },
+          {
+            question: "Quelle particule porte une charge négative ?",
+            options: ["Proton", "Neutron", "Électron", "Photon"],
+            answer: 2
+          },
+          {
+            question: "Quel phénomène explique la formation de l’arc-en-ciel ?",
+            options: ["Réflexion", "Diffraction", "Réfraction", "Absorption"],
+            answer: 2
+          },
+          {
+            question: "Qui a découvert la radioactivité ?",
+            options: ["Pierre Curie", "Marie Curie", "Henri Becquerel", "Isaac Newton"],
+            answer: 2
+          },
+          {
+            question: "Quel est l’unité de mesure de la puissance électrique ?",
+            options: ["Volt", "Ampère", "Watt", "Ohm"],
+            answer: 2
+          },
+          {
+            question: "Dans E = mc², que représente ‘c’ ?",
+            options: [
+              "La constante de Planck",
+              "La vitesse de la lumière",
+              "La charge électrique",
+              "La masse volumique"
+            ],
+            answer: 1
+          }
+        ]
+      },
+      {
+        name: "Optique et Lumière",
+        questions: [
+          {
+            question: "Quel phénomène explique la dispersion de la lumière blanche par un prisme ?",
+            options: ["Réflexion", "Réfraction", "Diffraction", "Absorption"],
+            answer: 1
+          },
+          {
+            question: "Quel instrument permet d’observer les spectres lumineux ?",
+            options: ["Spectroscope", "Microscope", "Oscilloscope", "Baromètre"],
+            answer: 0
+          },
+          {
+            question: "Quelle unité mesure la fréquence d’une onde lumineuse ?",
+            options: ["Newton", "Hertz", "Candela", "Joule"],
+            answer: 1
+          },
+          {
+            question: "La lumière visible est comprise entre ?",
+            options: ["100-400 nm", "400-700 nm", "700-1200 nm", "1-10 nm"],
+            answer: 1
+          },
+          {
+            question: "Qui a démontré la nature ondulatoire de la lumière ?",
+            options: ["Newton", "Young", "Einstein", "Faraday"],
+            answer: 1
+          }
+        ]
+      },
+      {
+        name: "Électricité et Circuits",
+        questions: [
+          {
+            question: "Quel est le symbole de la résistance électrique ?",
+            options: ["R", "V", "I", "W"],
+            answer: 0
+          },
+          {
+            question: "Que mesure un ampèremètre ?",
+            options: ["La tension", "L’intensité", "La puissance", "La résistance"],
+            answer: 1
+          },
+          {
+            question: "La loi d’Ohm s’écrit ?",
+            options: ["U = R/I", "I = U/R", "U = R×I", "R = U+I"],
+            answer: 2
+          },
+          {
+            question: "Quelle unité pour la capacité d’un condensateur ?",
+            options: ["Farad", "Henry", "Ohm", "Watt"],
+            answer: 0
+          },
+          {
+            question: "Quel composant stocke temporairement de l’énergie électrique ?",
+            options: ["Résistance", "Condensateur", "Diode", "Bobine"],
+            answer: 1
+          }
+        ]
+      },
+      {
+        name: "Mécanique et Mouvement",
+        questions: [
+          {
+            question: "Quel est le principe fondamental de la dynamique ?",
+            options: [
+              "Action = Réaction",
+              "F = m×a",
+              "E = mc²",
+              "P = F×v"
+            ],
+            answer: 1
+          },
+          {
+            question: "La vitesse est exprimée en ?",
+            options: ["m/s", "kg", "N", "J"],
+            answer: 0
+          },
+          {
+            question: "Qui est le père de la mécanique classique ?",
+            options: ["Galilée", "Newton", "Einstein", "Pascal"],
+            answer: 1
+          },
+          {
+            question: "Quel instrument mesure la masse ?",
+            options: ["Balance", "Baromètre", "Voltmètre", "Chronomètre"],
+            answer: 0
+          },
+          {
+            question: "La trajectoire d’un projectile est généralement ?",
+            options: ["Rectiligne", "Circulaire", "Parabolique", "Elliptique"],
+            answer: 2
+          }
+        ]
+      },
+      {
+        name: "Thermodynamique",
+        questions: [
+          {
+            question: "Quel instrument mesure la température ?",
+            options: ["Thermomètre", "Manomètre", "Baromètre", "Voltmètre"],
+            answer: 0
+          },
+          {
+            question: "Quelle unité pour la température dans le système international ?",
+            options: ["Celsius", "Kelvin", "Fahrenheit", "Joule"],
+            answer: 1
+          },
+          {
+            question: "Le zéro absolu correspond à ?",
+            options: ["0°C", "-273,15°C", "100°C", "273,15°C"],
+            answer: 1
+          },
+          {
+            question: "La chaleur spécifique est ?",
+            options: [
+              "La quantité de chaleur pour élever de 1°C la température d’1 kg de substance",
+              "La quantité de chaleur pour fondre 1 kg de substance",
+              "L’énergie totale d’un système",
+              "La température à l’équilibre"
+            ],
+            answer: 0
+          },
+          {
+            question: "Qui a formulé la loi des gaz parfaits ?",
+            options: ["Newton", "Boyle", "Gay-Lussac", "Clapeyron"],
+            answer: 3
+          }
+        ]
+      }
+    ];
+
+    // Variables pour le QCM courant
+    let selectedQCM = 0;
+    let questions = qcmList[selectedQCM].questions;
+    let current = 0;
+    let score = 0;
+    let passed = 0;
+    let transitioning = false;
+    let userAnswers = [];
+
+    function setProgressBar() {
+      const percent = Math.round((current) / questions.length * 100);
+      document.getElementById('progress').style.width = percent + "%";
+      document.getElementById('progress-text').textContent = percent + "%";
+    }
+
+    function animateTransition(outCallback, inCallback) {
+      const qcm = document.getElementById('qcm');
+      qcm.classList.remove('fade-in');
+      qcm.classList.add('fade-out');
+      transitioning = true;
+      setTimeout(() => {
+        outCallback && outCallback();
+        qcm.classList.remove('fade-out');
+        inCallback && inCallback();
+        qcm.classList.add('fade-in');
+        setTimeout(() => { transitioning = false; }, 300);
+      }, 420);
+    }
+
+    function showQuestion() {
+      setProgressBar();
+      const q = questions[current];
+      let html = `<div class="question">${current + 1}/${questions.length} - ${q.question}</div><div class="options">`;
+      q.options.forEach((opt, idx) => {
+        html += `<label><input type="radio" name="option" value="${idx}"> ${opt}</label>`;
+      });
+      html += `</div>
+        <button onclick="btnClick(event,submitAnswer)">Valider</button>
+        <button class="ripple" onclick="btnClick(event,skipQuestion)">Passer</button>
+      `;
+      animateTransition(() => {
+        document.getElementById('qcm').innerHTML = html;
+      }, () => {});
+    }
+
+    function btnClick(e, fn) {
+      // ripple effect
+      const btn = e.currentTarget;
+      const circle = document.createElement('span');
+      circle.className = 'ripple-effect';
+      const d = Math.max(btn.clientWidth, btn.clientHeight);
+      circle.style.width = circle.style.height = d + 'px';
+      circle.style.left = (e.clientX - btn.getBoundingClientRect().left - d/2) + 'px';
+      circle.style.top = (e.clientY - btn.getBoundingClientRect().top - d/2) + 'px';
+      btn.appendChild(circle);
+      setTimeout(() => circle.remove(), 500);
+      fn();
+    }
+
+    function submitAnswer() {
+      if (transitioning) return;
+      const radios = document.getElementsByName('option');
+      let selected = -1;
+      for (let i = 0; i < radios.length; i++) {
+        if (radios[i].checked) selected = parseInt(radios[i].value);
+      }
+      if (selected === -1) {
+        alert("Veuillez choisir une réponse ou cliquez sur Passer.");
+        return;
+      }
+      userAnswers[current] = selected;
+      let good = (selected === questions[current].answer);
+      if (good) score++;
+      showCorrection(selected, good);
+    }
+
+    function skipQuestion() {
+      if (transitioning) return;
+      userAnswers[current] = null;
+      passed++;
+      current++;
+      if (current < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showCorrection(selected, isGood) {
+      const q = questions[current];
+      let html = `<div class="question">${current + 1}/${questions.length} - ${q.question}</div><div class="options">`;
+      q.options.forEach((opt, idx) => {
+        let labelClass = "";
+        if (idx === q.answer) labelClass = "label-correct";
+        if (selected === idx && selected !== q.answer) labelClass = "label-wrong";
+        if (selected === idx) labelClass += " label-selected";
+        html += `<label class="${labelClass}"><input type="radio" name="option" value="${idx}" disabled ${selected === idx ? "checked" : ""}> ${opt}</label>`;
+      });
+      html += `</div>`;
+      html += `<div class="explanation">${isGood
+        ? "Bravo, bonne réponse !"
+        : `Mauvaise réponse.<br>La bonne réponse était : <b>${q.options[q.answer]}</b>`}
+        </div>
+        <button onclick="btnClick(event,nextQuestion)">Suivant</button>
+      `;
+      animateTransition(() => {
+        document.getElementById('qcm').innerHTML = html;
+      }, () => {});
+    }
+
+    function nextQuestion() {
+      if (transitioning) return;
+      current++;
+      if (current < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      document.getElementById('progress').style.width = "100%";
+      document.getElementById('progress-text').textContent = "100%";
+      let note = Math.round((score / questions.length) * 20);
+      let commentaire = "";
+      if (note >= 18) commentaire = "Excellent ! Tu es un as de la physique !";
+      else if (note >= 14) commentaire = "Bravo, très bon niveau !";
+      else if (note >= 10) commentaire = "Pas mal, tu as des bases solides !";
+      else if (note >= 6) commentaire = "Peut mieux faire, révise encore un peu.";
+      else commentaire = "Il reste du travail, la physique n’a pas de secret pour toi… mais il faut réviser !";
+      let html = `
+        <div class="score">Ta note : ${note}/20</div>
+        <div class="comment">${commentaire}</div>
+        <div class="result-details">
+          <span>Réponses justes : <b>${score}</b></span> &mdash;
+          <span>Questions passées : <b>${passed}</b></span> <br>
+          <span>Questions totales : ${questions.length}</span>
+        </div>
+        <button onclick="btnClick(event,showCorrectionPage)">Voir la correction détaillée</button>
+        <button class="ripple" onclick="btnClick(event,restart)">Recommencer</button>
+      `;
+      animateTransition(() => {
+        document.getElementById('qcm').innerHTML = html;
+      }, () => {});
+    }
+
+    function showCorrectionPage() {
+      let html = `<div class="score" style="margin-top:6px;">Correction détaillée</div><div class="correction-list">`;
+      questions.forEach((q, i) => {
+        let userAns = userAnswers[i];
+        html += `<div class="correction-item">
+          <span class="correction-q">${i + 1}. ${q.question}</span>
+          <div class="correction-options">`;
+        q.options.forEach((opt, idx) => {
+          if (idx === q.answer) {
+            html += `<span class="correction-good">${opt}</span>`;
+          } else if (userAns === idx) {
+            html += `<span class="correction-bad">${opt}</span>`;
+          } else {
+            html += `<span class="correction-neutral">${opt}</span>`;
+          }
+        });
+        html += `</div>`;
+        if (userAns === null) {
+          html += `<div class="explanation">Question passée</div>`;
+        } else if (userAns === q.answer) {
+          html += `<div class="explanation">Bonne réponse !</div>`;
+        } else {
+          html += `<div class="explanation">Ta réponse : <b>${q.options[userAns]}</b><br>Bonne réponse : <b>${q.options[q.answer]}</b></div>`;
+        }
+        html += `</div>`;
+      });
+      html += `</div><div class="score">Découvre d'autres QCM :</div><ul class="qcm-select-list">`;
+      qcmList.forEach((qcm, idx) => {
+        html += `<li onclick="selectQCM(${idx})" ${selectedQCM===idx?"class='selected'":""}>${qcm.name}</li>`;
+      });
+      html += `</ul>
+        <button onclick="btnClick(event,restart)">Faire ce QCM à nouveau</button>
+      `;
+      animateTransition(() => {
+        document.getElementById('qcm').innerHTML = html;
+      }, () => {});
+    }
+
+    function selectQCM(idx) {
+      selectedQCM = idx;
+      questions = qcmList[selectedQCM].questions;
+      current = 0;
+      score = 0;
+      passed = 0;
+      userAnswers = [];
+      document.querySelectorAll('.qcm-select-list li').forEach((li, i) => {
+        if(i === idx) li.classList.add('selected');
+        else li.classList.remove('selected');
+      });
+      showQuestion();
+    }
+
+    function restart() {
+      if (transitioning) return;
+      current = 0;
+      score = 0;
+      passed = 0;
+      userAnswers = [];
+      showQuestion();
+    }
+
+    // Démarrage QCM avec fade-in initial
+    document.getElementById('qcm').classList.add('fade-in');
+    showQuestion();
+  </script>
+</body>
+</html>
