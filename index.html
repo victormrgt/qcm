@@ -63,6 +63,7 @@
       transition: background 0.3s ease, color 0.3s ease;
       cursor: pointer;
       user-select: none;
+      border: none;
     }
 
     .btn:hover {
@@ -70,14 +71,86 @@
       color: #fff;
       box-shadow: 0 8px 20px rgba(90, 62, 138, 0.8);
     }
+
+    /* --- DROPDOWN --- */
+    .dropdown {
+      position: relative;
+      width: 100%;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .dropdown-content a {
+      display: block;
+      padding: 12px 0;
+      color: #764ba2;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+
+    .show {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Bienvenue sur le QCM</h1>
     <p>Choisissez votre version :</p>
+    
     <a href="qcmv5.html" class="btn">Accéder à la version finale</a>
-    <a href="versions-ulterieures.html" class="btn">Voir les versions ultérieures</a>
+
+    <!-- BOUTON DÉROULANT -->
+    <div class="dropdown">
+      <button class="btn" onclick="toggleDropdown()">Voir les versions ultérieures ▼</button>
+      <div id="dropdownMenu" class="dropdown-content">
+        <a href="qcmv1.html">Version 1</a>
+        <a href="qcmv2.html">Version 2</a>
+        <a href="qcmv3.html">Version 3</a>
+        <a href="qcmv4.html">Version 4</a>
+      </div>
+    </div>
   </div>
+
+  <script>
+    function toggleDropdown() {
+      document.getElementById("dropdownMenu").classList.toggle("show");
+    }
+
+    // Ferme le menu si on clique ailleurs
+    window.onclick = function(event) {
+      if (!event.target.matches('.btn')) {
+        const dropdowns = document.getElementsByClassName("dropdown-content");
+        for (let i = 0; i < dropdowns.length; i++) {
+          const openDropdown = dropdowns[i];
+          if (openDropdown.classList.contains('show')) {
+            openDropdown.classList.remove('show');
+          }
+        }
+      }
+    }
+  </script>
 </body>
 </html>
