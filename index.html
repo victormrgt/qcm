@@ -1,32 +1,83 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Page d'accueil - QCM Versions</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Accueil - QCM</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 40px 60px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h1 {
+      font-weight: 600;
+      margin-bottom: 20px;
+      font-size: 2.4rem;
+      letter-spacing: 1px;
+    }
+
+    p {
+      font-weight: 400;
+      margin-bottom: 40px;
+      font-size: 1.1rem;
+      color: #e0e0e0;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 15px 0;
+      margin: 15px 0;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-decoration: none;
+      color: #764ba2;
+      background: #fff;
+      box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+      transition: background 0.3s ease, color 0.3s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .btn:hover {
+      background: #5a3e8a;
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(90, 62, 138, 0.8);
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Bienvenue sur le site des QCM</h1>
-    <p>Choisissez une version de QCM :</p>
-  </header>
-
-  <nav>
-    <ul>
-      <li><a href="qcmv1.html">QCM Version 1</a></li>
-      <li><a href="qcmv2.html">QCM Version 2</a></li>
-      <li><a href="qcm_v3.html">QCM Version 3</a></li>
-      <li><a href="qcmv4.html">QCM Version 4</a></li>
-      <li><a href="qcmv5.html">QCM Version 5</a></li>
-      <li><a href="qcmv6.html">QCM Version 6</a></li>
-      
-      <!-- Ajouter d'autres versions si nécessaire -->
-    </ul>
-  </nav>
-
-  <footer>
-    <p>&copy; 2025 Mon Site QCM</p>
-  </footer>
+  <div class="container">
+    <h1>Bienvenue sur le QCM</h1>
+    <p>Choisissez votre version :</p>
+    <a href="version-finale.html" class="btn">Accéder à la version finale</a>
+    <a href="versions-ulterieures.html" class="btn">Voir les versions ultérieures</a>
+  </div>
 </body>
 </html>
